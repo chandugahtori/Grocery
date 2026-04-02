@@ -7,6 +7,11 @@ from app.config import settings
 from app.database import AsyncSessionLocal
 from app.routers import auth, users, products, categories, cart, orders, admin
 
+# Configure logging — shows INFO and above for all navix.* loggers
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(name)s — %(message)s",
+)
 logger = logging.getLogger("navix.startup")
 
 

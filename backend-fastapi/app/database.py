@@ -2,12 +2,21 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase
 from app.config import settings
 
+# For Supabase Transaction Pooler (pgbouncer):
+#   - statement_cache_size=0  (required for pgbouncer)
+#   - server_settings search_path=public (pooler resets search_path otherwise)
+connect_args = {}
+if "pooler.supabase.com" in settings.DATABASE_URL:
+    connect_args["statement_cache_size"] = 0
+    connect_args["server_settings"] = {"search_path": "public"}
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.ENVIRONMENT == "development",
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    pool_size=5,
+    max_overflow=10,
+    connect_args=connect_args,
 )
 
 AsyncSessionLocal = async_sessionmaker(
