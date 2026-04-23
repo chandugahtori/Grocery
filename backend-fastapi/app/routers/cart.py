@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models import Cart, CartItem, Product, User
-from app.schemas import CartOut, CartItemAdd, CartItemUpdate, CartItemOut
+from app.schemas import CartOut, CartItemAdd, CartItemUpdate
 from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
@@ -49,7 +49,7 @@ async def add_item(
 ):
     # Validate product
     prod_result = await db.execute(
-        select(Product).where(Product.id == payload.product_id, Product.is_active == True)
+        select(Product).where(Product.id == payload.product_id, Product.is_active.is_(True))
     )
     product = prod_result.scalar_one_or_none()
     if not product:

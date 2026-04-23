@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Truck, Shield, Clock, Leaf } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import Loader from '../components/Loader'
-import { getProducts, getCategories } from '../api/productService'
+import { getProducts } from '../api/productService'
 
 const HERO_CATEGORIES = [
   { name: 'Fruits & Veg', slug: 'fruits-vegetables', emoji: '🥦', color: 'from-green-400 to-emerald-500' },
@@ -73,10 +73,11 @@ export default function Home() {
       <section className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {FEATURES.map(({ icon: Icon, title, desc, color }) => (
+            {/* eslint-disable-next-line no-unused-vars */}
+            {FEATURES.map(({ icon: FeatureIcon, title, desc, color }) => (
               <div key={title} className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} shrink-0`}>
-                  <Icon size={20} />
+                  <FeatureIcon size={20} />
                 </div>
                 <div>
                   <p className="font-semibold text-slate-800 text-sm">{title}</p>

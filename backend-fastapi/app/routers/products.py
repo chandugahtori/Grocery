@@ -24,9 +24,9 @@ async def list_products(
     query = (
         select(Product)
         .options(selectinload(Product.category))
-        .where(Product.is_active == True)
+        .where(Product.is_active.is_(True))
     )
-    count_query = select(func.count(Product.id)).where(Product.is_active == True)
+    count_query = select(func.count(Product.id)).where(Product.is_active.is_(True))
 
     if category:
         # Try slug first, then try numeric id
@@ -76,12 +76,12 @@ async def search_products(
         select(Product)
         .options(selectinload(Product.category))
         .where(
-            Product.is_active == True,
+            Product.is_active.is_(True),
             or_(Product.name.ilike(pattern), Product.description.ilike(pattern)),
         )
     )
     count_query = select(func.count(Product.id)).where(
-        Product.is_active == True,
+        Product.is_active.is_(True),
         or_(Product.name.ilike(pattern), Product.description.ilike(pattern)),
     )
 
@@ -104,7 +104,7 @@ async def get_product(product_id: uuid.UUID, db: AsyncSession = Depends(get_db))
     result = await db.execute(
         select(Product)
         .options(selectinload(Product.category))
-        .where(Product.id == product_id, Product.is_active == True)
+        .where(Product.id == product_id, Product.is_active.is_(True))
     )
     product = result.scalar_one_or_none()
     if not product:

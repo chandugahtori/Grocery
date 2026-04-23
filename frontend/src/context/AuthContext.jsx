@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { login as loginApi, register as registerApi } from '../api/authService'
 
 const AuthContext = createContext(null)

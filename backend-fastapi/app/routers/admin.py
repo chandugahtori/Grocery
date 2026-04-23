@@ -8,13 +8,12 @@ from sqlalchemy.orm import selectinload
 from typing import List
 
 from app.database import get_db
-from app.models import Product, Order, OrderItem, User, Category
+from app.models import Product, Order, OrderItem, User
 from app.schemas import (
     ProductCreate, ProductUpdate, ProductOut,
     OrderOut, OrderStatusUpdate, AnalyticsOut, ProductListResponse,
 )
 from app.dependencies import require_admin
-from app.utils.auth import hash_password
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 

@@ -1,14 +1,13 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingCart, User, Search, LogOut, LayoutDashboard, Package, Menu, X, Leaf } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 
 export default function Navbar() {
-  const { isLoggedIn, isAdmin, logout, user } = useAuth()
+  const { isLoggedIn, isAdmin, logout } = useAuth()
   const { itemCount } = useCart()
   const navigate = useNavigate()
-  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchQ, setSearchQ] = useState('')
 

@@ -125,10 +125,11 @@ export default function AdminDashboard() {
                 { label: 'Total Orders', value: analytics.total_orders, icon: ShoppingBag, color: 'from-blue-400 to-cyan-500' },
                 { label: 'Total Users', value: analytics.total_users, icon: Users, color: 'from-purple-400 to-violet-500' },
                 { label: "Today's Revenue", value: `₹${analytics.revenue_today.toFixed(2)}`, icon: TrendingUp, color: 'from-orange-400 to-amber-500' },
-              ].map(({ label, value, icon: Icon, color }) => (
+              // eslint-disable-next-line no-unused-vars
+              ].map(({ label, value, icon: StatIcon, color }) => (
                 <div key={label} className="card p-5">
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3`}>
-                    <Icon size={18} className="text-white" />
+                    <StatIcon size={18} className="text-white" />
                   </div>
                   <p className="text-2xl font-extrabold text-slate-800">{value}</p>
                   <p className="text-sm text-slate-400 mt-0.5">{label}</p>

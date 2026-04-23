@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from typing import List
 
 from app.database import get_db
-from app.models import Order, OrderItem, Payment, Cart, CartItem, Product, User
+from app.models import Order, OrderItem, Payment, Cart, CartItem, User
 from app.schemas import OrderCreate, OrderOut
 from app.dependencies import get_current_user
 

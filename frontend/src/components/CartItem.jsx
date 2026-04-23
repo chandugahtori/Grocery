@@ -17,7 +17,7 @@ export default function CartItem({ item }) {
     }
     try {
       await updateItem(id, newQty)
-    } catch (err) {
+    } catch {
       toast.error('Failed to update quantity')
     }
   }
