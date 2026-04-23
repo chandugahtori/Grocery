@@ -1,18 +1,20 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  // ⭐ CHANGE HERE:
+  // Agar environment variable set hai (Vercel pe), toh wo use karega.
+  // Nahi toh local development ke liye localhost use karega.
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Attach JWT token to every request
+// Baki niche ka code (interceptors) bilkul same rahega, usme koi galti nahi hai
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('navix_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-// Handle 401 — clear token and redirect to login
 api.interceptors.response.use(
   (res) => res,
   (error) => {
