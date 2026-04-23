@@ -249,9 +249,9 @@ jobs:
       # server always runs the same version as the current commit
       - name: 📂 Sync docker-compose.yml to server
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
-          USER: ${{ secrets.DEPLOY_USER }}
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi: Brackets laga diye
+          USER: ${{ secrets.DEPLOY_USER }}      # ✅ Sahi
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }} # ✅ Sahi
         run: |
           scp -o StrictHostKeyChecking=no \
               docker-compose.yml \
@@ -259,10 +259,10 @@ jobs:
 
       - name: 🚀 Deploy via SSH
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
-          USER: ${{ secrets.DEPLOY_USER }}
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi
+          USER: ${{ secrets.DEPLOY_USER }}      # ✅ Sahi
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }} # ✅ Sahi
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }} # ✅ Sahi
         run: |
           ssh -o StrictHostKeyChecking=no "$USER@$HOST" bash -s << 'ENDSSH'
             set -euo pipefail
@@ -283,7 +283,7 @@ jobs:
       # Navix exposes /health via the nginx proxy → FastAPI backend
       - name: 🩺 Health check (/health endpoint)
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
+          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi
         run: |
           echo "⏳ Waiting 20s for containers to warm up..."
           sleep 20
