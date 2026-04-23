@@ -71,10 +71,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo credentials hint */}
-          <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700">
-            <strong>Admin demo:</strong> admin@navix.com / Admin@1234
-          </div>
 
           <p className="text-center text-sm text-slate-500 mt-5">
             Don't have an account?{' '}
