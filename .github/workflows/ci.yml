@@ -161,7 +161,9 @@ jobs:
     name: 🐳 Build & Push Docker Images
     runs-on: ubuntu-latest
     needs: [backend-ci, frontend-ci]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.DOCKERHUB_TOKEN != ''
+    # ⚠️  Skipped gracefully if DOCKERHUB_USERNAME / DOCKERHUB_TOKEN secrets are not set
+    continue-on-error: true
 
     steps:
       - name: ⬇️ Checkout code
@@ -228,7 +230,9 @@ jobs:
     name: 🚀 Deploy to Production
     runs-on: ubuntu-latest
     needs: docker-push
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.DEPLOY_SSH_KEY != ''
+    # ⚠️  Skipped gracefully if DEPLOY_* secrets are not set
+    continue-on-error: true
 
     # Links this job to a GitHub Environment called "production"
     # so you can add required reviewers / protection rules there
@@ -249,9 +253,9 @@ jobs:
       # server always runs the same version as the current commit
       - name: 📂 Sync docker-compose.yml to server
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi: Brackets laga diye
-          USER: ${{ secrets.DEPLOY_USER }}      # ✅ Sahi
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }} # ✅ Sahi
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
         run: |
           scp -o StrictHostKeyChecking=no \
               docker-compose.yml \
@@ -259,10 +263,10 @@ jobs:
 
       - name: 🚀 Deploy via SSH
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi
-          USER: ${{ secrets.DEPLOY_USER }}      # ✅ Sahi
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }} # ✅ Sahi
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }} # ✅ Sahi
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           ssh -o StrictHostKeyChecking=no "$USER@$HOST" bash -s << 'ENDSSH'
             set -euo pipefail
@@ -283,7 +287,7 @@ jobs:
       # Navix exposes /health via the nginx proxy → FastAPI backend
       - name: 🩺 Health check (/health endpoint)
         env:
-          HOST: ${{ secrets.DEPLOY_HOST }}      # ✅ Sahi
+          HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           echo "⏳ Waiting 20s for containers to warm up..."
           sleep 20
