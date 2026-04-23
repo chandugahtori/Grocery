@@ -1,14 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  // ⭐ CHANGE HERE:
-  // Agar environment variable set hai (Vercel pe), toh wo use karega.
-  // Nahi toh local development ke liye localhost use karega.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  // ⭐ UPDATED LINE:
+  // Vercel Dashboard mein tumhara naam 'VITE_API_BASE_URL' hai, isliye yahan bhi wahi hona chahiye.
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Baki niche ka code (interceptors) bilkul same rahega, usme koi galti nahi hai
+// Interceptors (Request aur Response logic same rahega)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('navix_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
