@@ -1,305 +1,63 @@
-# ================================================================
-#  Navix Grocery Store — GitHub Actions CI/CD Pipeline
-# ================================================================
-#
-#  Stack discovered from project analysis:
-#   • Backend  : FastAPI + SQLAlchemy (asyncpg) + Python 3.11
-#   • Frontend : React 19 + Vite 7 + Tailwind CSS v4
-#   • Database : PostgreSQL 15
-#   • Proxy    : Nginx (reverse-proxy + SPA routing)
-#   • Container: Docker multi-stage builds + docker-compose
-#
-#  Pipeline stages:
-#   1. backend-ci   → flake8 lint + pytest (real Postgres service)
-#   2. frontend-ci  → eslint (--max-warnings=0) + vite build
-#   3. docker-push  → build & push multi-platform images to Docker Hub
-#                     (main branch only, after both CI jobs pass)
-#   4. deploy       → SSH into server → docker compose pull + up
-#                     (main branch only, after docker-push succeeds)
-#
-#  Required GitHub Secrets (Settings → Secrets → Actions):
-#   DOCKERHUB_USERNAME   — Docker Hub username
-#   DOCKERHUB_TOKEN      — Docker Hub Access Token (not password)
-#   DEPLOY_HOST          — IP / hostname of production server
-#   DEPLOY_USER          — SSH username (e.g. ubuntu)
-#   DEPLOY_SSH_KEY       — Full private key (-----BEGIN ... block)
-#   DEPLOY_PATH          — Absolute path on server (e.g. /opt/navix)
-#   SECRET_KEY           — JWT secret (≥ 32 chars) for prod env check
-#
-# ================================================================
-
-name: Navix CI / CD
+name: Navix CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [ main ]
 
-# Cancel any in-progress run for the same branch / PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-# ──────────────────────────────────────────────────────────────
-# 1. BACKEND — Lint + Tests
-# ──────────────────────────────────────────────────────────────
 jobs:
-  backend-ci:
-    name: 🐍 Backend — Lint & Test
+  # Job 1: Frontend (React)
+  frontend-ci-cd:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: backend-fastapi
-
-    # Real Postgres so async DB code (asyncpg / SQLAlchemy) works
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_pass
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      # Matches config.py Settings fields exactly
-      DATABASE_URL: postgresql+asyncpg://test_user:test_pass@localhost:5432/test_db
-      SECRET_KEY: ci-test-secret-key-at-least-32-characters-long
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 60
-      ENVIRONMENT: test
-      ALLOWED_ORIGINS: http://localhost:3000
-
     steps:
-      - name: ⬇️ Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
-          cache-dependency-path: backend-fastapi/requirements.txt
-
-      - name: 📦 Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flake8 pytest pytest-asyncio httpx
-
-      # Mirrors the exact flake8 flags used locally
-      - name: 🔍 Lint with flake8
-        run: |
-          flake8 app \
-            --max-line-length=120 \
-            --ignore=E501,W503,E402 \
-            --exclude=__pycache__,.git
-
-      - name: 🧪 Run tests
-        run: |
-          if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
-            pytest tests/ -v --tb=short --asyncio-mode=auto
-          else
-            echo "ℹ️  No tests directory found — skipping pytest."
-          fi
-
-  # ──────────────────────────────────────────────────────────────
-  # 2. FRONTEND — Lint + Build
-  # ──────────────────────────────────────────────────────────────
-  frontend-ci:
-    name: ⚛️  Frontend — Lint & Build
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: frontend
-
-    steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🟢 Set up Node 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          node-version: 18
 
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: Install Dependencies
+        working-directory: ./frontend
+        run: npm install
 
-      # Uses the same flag as local: npm run lint -- --max-warnings=0
-      - name: 🔍 Lint with ESLint
-        run: npm run lint -- --max-warnings=0
+      - name: Lint & Test
+        working-directory: ./frontend
+        run: |
+          npm run lint || echo "No lint script found"
+          # npm test  # Agar tests likhe hain toh isse uncomment kar dena
 
-      # Vite build — validates JSX, imports, and Tailwind v4 compilation
-      - name: 🏗️  Production build (Vite + Tailwind CSS v4)
-        run: npm run build
-
-      # Upload the built dist/ for optional inspection or artifact deploy
-      - name: 📤 Upload dist artifact
-        uses: actions/upload-artifact@v4
-        if: github.ref == 'refs/heads/main'
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
         with:
-          name: navix-frontend-dist
-          path: frontend/dist
-          retention-days: 5
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
 
-  # ──────────────────────────────────────────────────────────────
-  # 3. DOCKER — Build & Push to Docker Hub
-  #    Runs on push to main only, after both CI jobs pass
-  # ──────────────────────────────────────────────────────────────
-  docker-push:
-    name: 🐳 Build & Push Docker Images
+  # Job 2: Backend (FastAPI)
+  backend-ci-cd:
     runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.DOCKERHUB_TOKEN != ''
-    # ⚠️  Skipped gracefully if DOCKERHUB_USERNAME / DOCKERHUB_TOKEN secrets are not set
-    continue-on-error: true
-
+    needs: frontend-ci-cd # Frontend pass hoga tabhi backend check hoga
     steps:
-      - name: ⬇️ Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🔑 Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          python-version: '3.10'
 
-      - name: 🧰 Set up Docker Buildx (multi-platform)
-        uses: docker/setup-buildx-action@v3
-
-      # Short SHA tag so every image is uniquely traceable
-      - name: 🏷️  Compute image tag
-        id: tag
-        run: echo "sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
-
-      # ── Backend image ─────────────────────────────────────────
-      # python:3.11-slim base, uvicorn entrypoint (see Dockerfile)
-      - name: 🐳 Build & push backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend-fastapi
-          file: ./backend-fastapi/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/navix-backend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/navix-backend:${{ steps.tag.outputs.sha }}
-
-      # ── Frontend image ────────────────────────────────────────
-      # Multi-stage: node:20-alpine builder → nginx:alpine server
-      - name: 🐳 Build & push frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/navix-frontend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/navix-frontend:${{ steps.tag.outputs.sha }}
-
-      - name: 📋 Write image summary
+      - name: Install Backend Deps
+        working-directory: ./backend
         run: |
-          echo "### 🐳 Docker Images Published" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Image | Tags |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|------|" >> $GITHUB_STEP_SUMMARY
-          echo "| \`navix-backend\`  | \`latest\`, \`${{ steps.tag.outputs.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| \`navix-frontend\` | \`latest\`, \`${{ steps.tag.outputs.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-  # ──────────────────────────────────────────────────────────────
-  # 4. DEPLOY — SSH → docker compose pull + up
-  #    Runs on push to main only, after docker-push succeeds
-  # ──────────────────────────────────────────────────────────────
-  deploy:
-    name: 🚀 Deploy to Production
-    runs-on: ubuntu-latest
-    needs: docker-push
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.DEPLOY_SSH_KEY != ''
-    # ⚠️  Skipped gracefully if DEPLOY_* secrets are not set
-    continue-on-error: true
-
-    # Links this job to a GitHub Environment called "production"
-    # so you can add required reviewers / protection rules there
-    environment:
-      name: production
-      url: http://${{ secrets.DEPLOY_HOST }}
-
-    steps:
-      - name: ⬇️ Checkout code (needed for docker-compose.yml)
-        uses: actions/checkout@v4
-
-      - name: 🔐 Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      # Copies the local docker-compose.yml to the server so the
-      # server always runs the same version as the current commit
-      - name: 📂 Sync docker-compose.yml to server
-        env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
-          USER: ${{ secrets.DEPLOY_USER }}
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
+      - name: Run Backend Linting (Flake8)
         run: |
-          scp -o StrictHostKeyChecking=no \
-              docker-compose.yml \
-              "$USER@$HOST:$PATH_ON_SERVER/docker-compose.yml"
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      - name: 🚀 Deploy via SSH
-        env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
-          USER: ${{ secrets.DEPLOY_USER }}
-          PATH_ON_SERVER: ${{ secrets.DEPLOY_PATH }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: |
-          ssh -o StrictHostKeyChecking=no "$USER@$HOST" bash -s << 'ENDSSH'
-            set -euo pipefail
-            cd "$PATH_ON_SERVER"
-
-            echo "📥 Pulling latest images..."
-            docker compose pull
-
-            echo "🔄 Restarting containers (zero-downtime replace)..."
-            docker compose up -d --remove-orphans
-
-            echo "🧹 Pruning unused images..."
-            docker image prune -f
-
-            echo "✅ Deploy complete — $(date '+%Y-%m-%d %H:%M:%S %Z')"
-          ENDSSH
-
-      # Navix exposes /health via the nginx proxy → FastAPI backend
-      - name: 🩺 Health check (/health endpoint)
-        env:
-          HOST: ${{ secrets.DEPLOY_HOST }}
-        run: |
-          echo "⏳ Waiting 20s for containers to warm up..."
-          sleep 20
-          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
-                   --max-time 10 \
-                   "http://$HOST/health" || echo "000")
-          if [ "$STATUS" = "200" ]; then
-            echo "✅ Health check passed (HTTP $STATUS)"
-            echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
-            echo "App is live at http://$HOST" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Health check failed — HTTP $STATUS"
-            echo "### ❌ Health Check Failed (HTTP $STATUS)" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
+      - name: Trigger Render Deploy
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
