@@ -57,7 +57,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             <Link to="/products" className="btn-ghost text-sm">Shop</Link>
 
-            {isLoggedIn && !isAdmin && (
+            {isLoggedIn && (
               <Link to="/cart" className="btn-ghost relative text-sm">
                 <ShoppingCart size={18} />
                 Cart
@@ -115,7 +115,7 @@ export default function Navbar() {
             <button type="submit" className="btn-primary py-2 px-4 text-sm">Go</button>
           </form>
           <Link to="/products" className="block py-2 text-sm font-medium text-slate-700" onClick={() => setMenuOpen(false)}>🛒 Shop</Link>
-          {isLoggedIn && !isAdmin && (
+          {isLoggedIn && (
             <Link to="/cart" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-700" onClick={() => setMenuOpen(false)}>
               <ShoppingCart size={16} /> Cart {itemCount > 0 && <span className="badge badge-green">{itemCount}</span>}
             </Link>

@@ -26,8 +26,8 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    cart: Mapped["Cart"] = relationship("Cart", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    orders: Mapped[list["Order"]] = relationship("Order", back_populates="user")
+    cart: Mapped["Cart"] = relationship("Cart", back_populates="user", uselist=False, cascade="all, delete-orphan", lazy="noload")
+    orders: Mapped[list["Order"]] = relationship("Order", back_populates="user", lazy="noload")
 
 
 class Category(Base):
@@ -39,7 +39,7 @@ class Category(Base):
     image_url: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
-    products: Mapped[list["Product"]] = relationship("Product", back_populates="category")
+    products: Mapped[list["Product"]] = relationship("Product", back_populates="category", lazy="noload")
 
 
 class Product(Base):
@@ -59,9 +59,9 @@ class Product(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    category: Mapped["Category"] = relationship("Category", back_populates="products")
-    cart_items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="product")
-    order_items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="product")
+    category: Mapped["Category"] = relationship("Category", back_populates="products", lazy="noload")
+    cart_items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="product", lazy="noload")
+    order_items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="product", lazy="noload")
 
 
 class Cart(Base):
@@ -72,8 +72,8 @@ class Cart(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    user: Mapped["User"] = relationship("User", back_populates="cart")
-    items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+    user: Mapped["User"] = relationship("User", back_populates="cart", lazy="noload")
+    items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan", lazy="noload")
 
 
 class CartItem(Base):
@@ -87,8 +87,8 @@ class CartItem(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    cart: Mapped["Cart"] = relationship("Cart", back_populates="items")
-    product: Mapped["Product"] = relationship("Product", back_populates="cart_items")
+    cart: Mapped["Cart"] = relationship("Cart", back_populates="items", lazy="noload")
+    product: Mapped["Product"] = relationship("Product", back_populates="cart_items", lazy="noload")
 
 
 class Order(Base):
@@ -107,9 +107,9 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
-    user: Mapped["User"] = relationship("User", back_populates="orders")
-    items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
-    payment: Mapped["Payment"] = relationship("Payment", back_populates="order", uselist=False, cascade="all, delete-orphan")
+    user: Mapped["User"] = relationship("User", back_populates="orders", lazy="noload")
+    items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan", lazy="noload")
+    payment: Mapped["Payment"] = relationship("Payment", back_populates="order", uselist=False, cascade="all, delete-orphan", lazy="noload")
 
 
 class OrderItem(Base):
@@ -124,8 +124,8 @@ class OrderItem(Base):
     product_image_url: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
-    order: Mapped["Order"] = relationship("Order", back_populates="items")
-    product: Mapped["Product"] = relationship("Product", back_populates="order_items")
+    order: Mapped["Order"] = relationship("Order", back_populates="items", lazy="noload")
+    product: Mapped["Product"] = relationship("Product", back_populates="order_items", lazy="noload")
 
 
 class Payment(Base):
@@ -140,4 +140,4 @@ class Payment(Base):
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
-    order: Mapped["Order"] = relationship("Order", back_populates="payment")
+    order: Mapped["Order"] = relationship("Order", back_populates="payment", lazy="noload")

@@ -13,7 +13,8 @@ INSERT INTO categories (name, slug, image_url) VALUES
   ('Spices & Masala',     'spices-masala',     'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400'),
   ('Packaged Foods',      'packaged-foods',    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400'),
   ('Personal Care',       'personal-care',     'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400'),
-  ('Cleaning & Household','cleaning-household','https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400');
+  ('Cleaning & Household','cleaning-household','https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400'), 
+  ('Pulses',              'Organic Pulses',    'https://plus.unsplash.com/premium_photo-1722945635992-8eda6a907978?q=80&w=1960&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 
 -- Products — Fruits & Vegetables (category_id = 1)
 INSERT INTO products (name, slug, description, price, discount_price, stock, unit, category_id, image_url) VALUES

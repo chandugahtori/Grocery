@@ -23,9 +23,38 @@ async def get_or_create_cart(user: User, db: AsyncSession) -> Cart:
         cart = Cart(user_id=user.id)
         db.add(cart)
         await db.flush()
-        await db.refresh(cart)
-        cart.items = []
+        # Re-query with eager loading to avoid lazy load in async context
+        # (cart.items = [] would trigger MissingGreenlet / greenlet_spawn error)
+        refreshed = await db.execute(
+            select(Cart)
+            .options(selectinload(Cart.items).selectinload(CartItem.product).selectinload(Product.category))
+            .where(Cart.id == cart.id)
+        )
+        cart = refreshed.scalar_one()
     return cart
+
+
+async def _fresh_cart_response(user: User, db: AsyncSession) -> CartOut:
+    """After any mutation + flush, expire the session identity-map cache and
+    re-fetch the cart with fully eager-loaded relationships so the response
+    always reflects the current DB state."""
+    # ⚠️ Capture user_id BEFORE expire_all() — expire_all() would expire the
+    # user object too, making user.id trigger a sync DB reload (MissingGreenlet)
+    user_id = user.id
+    db.expire_all()
+    result = await db.execute(
+        select(Cart)
+        .options(selectinload(Cart.items).selectinload(CartItem.product).selectinload(Product.category))
+        .where(Cart.user_id == user_id)
+    )
+    cart = result.scalar_one_or_none()
+    if cart is None:
+        return CartOut(id=uuid.uuid4(), items=[], total=0.0)
+    total = sum(
+        float(item.product.discount_price or item.product.price) * item.quantity
+        for item in cart.items
+    )
+    return CartOut(id=cart.id, items=cart.items, total=round(total, 2))
 
 
 @router.get("", response_model=CartOut)
@@ -74,7 +103,7 @@ async def add_item(
         db.add(item)
 
     await db.flush()
-    return await get_cart(current_user, db)
+    return await _fresh_cart_response(current_user, db)
 
 
 @router.put("/items/{item_id}", response_model=CartOut)
@@ -101,7 +130,7 @@ async def update_item(
     item.quantity = payload.quantity
     db.add(item)
     await db.flush()
-    return await get_cart(current_user, db)
+    return await _fresh_cart_response(current_user, db)
 
 
 @router.delete("/items/{item_id}", response_model=CartOut)
@@ -119,7 +148,7 @@ async def remove_item(
         raise HTTPException(status_code=404, detail="Cart item not found")
     await db.delete(item)
     await db.flush()
-    return await get_cart(current_user, db)
+    return await _fresh_cart_response(current_user, db)
 
 
 @router.delete("", status_code=204)
