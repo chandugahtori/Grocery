@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import {
   LayoutDashboard, Package, ShoppingBag, Users, TrendingUp,
-  Plus, Edit2, Trash2, Check, X, ChevronDown,
+  Plus, Edit2, Trash2, Check, X, ChevronDown, Eye, EyeOff, MapPin,
 } from 'lucide-react'
 import { getAnalytics, adminGetOrders, updateOrderStatus, getAdminUsers } from '../../api/orderService'
 import { adminGetProducts, createProduct, updateProduct, deleteProduct } from '../../api/productService'
@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [editProduct, setEditProduct] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_PRODUCT)
+  const [expandedOrder, setExpandedOrder] = useState(null)
   const queryClient = useQueryClient()
 
   // Queries
@@ -327,28 +328,113 @@ export default function AdminDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-slate-50">
-                  <tr>{['Order ID', 'Customer', 'Amount', 'Status', 'Date', 'Update Status'].map((h) => (
+                  <tr>{['Order ID', 'Items', 'Amount', 'Status', 'Date', 'Update Status', 'Details'].map((h) => (
                     <th key={h} className="text-left text-xs font-semibold text-slate-500 px-5 py-3 uppercase tracking-wider">{h}</th>
                   ))}</tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody>
                   {orders.map((o) => (
-                    <tr key={o.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-3 font-mono text-xs text-slate-400">#{o.id.slice(0, 8).toUpperCase()}</td>
-                      <td className="px-5 py-3 text-slate-600">{o.address_line1.slice(0, 20)}…</td>
-                      <td className="px-5 py-3 font-bold text-slate-800">₹{o.total_amount}</td>
-                      <td className="px-5 py-3"><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
-                      <td className="px-5 py-3 text-slate-400">{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
-                      <td className="px-5 py-3">
-                        <select
-                          value={o.status}
-                          onChange={(e) => orderStatusMutation.mutate({ id: o.id, status: e.target.value })}
-                          className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 cursor-pointer"
-                        >
-                          {STATUSES.map((s) => <option key={s} value={s} className="capitalize">{s}</option>)}
-                        </select>
-                      </td>
-                    </tr>
+                    <>
+                      <tr key={o.id} className={`hover:bg-slate-50 transition-colors border-b border-slate-50 ${expandedOrder === o.id ? 'bg-green-50/40' : ''}`}>
+                        <td className="px-5 py-3 font-mono text-xs text-slate-400">#{o.id.slice(0, 8).toUpperCase()}</td>
+                        <td className="px-5 py-3 text-slate-600">
+                          <span className="font-semibold text-slate-700">{o.items?.length || 0}</span>
+                          <span className="text-slate-400 ml-1">item{o.items?.length !== 1 ? 's' : ''}</span>
+                        </td>
+                        <td className="px-5 py-3 font-bold text-slate-800">₹{o.total_amount}</td>
+                        <td className="px-5 py-3"><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
+                        <td className="px-5 py-3 text-slate-400">{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+                        <td className="px-5 py-3">
+                          <select
+                            value={o.status}
+                            onChange={(e) => orderStatusMutation.mutate({ id: o.id, status: e.target.value })}
+                            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 cursor-pointer"
+                          >
+                            {STATUSES.map((s) => <option key={s} value={s} className="capitalize">{s}</option>)}
+                          </select>
+                        </td>
+                        <td className="px-5 py-3">
+                          <button
+                            onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
+                            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                              expandedOrder === o.id
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                            }`}
+                          >
+                            {expandedOrder === o.id ? <EyeOff size={13} /> : <Eye size={13} />}
+                            {expandedOrder === o.id ? 'Hide' : 'View'}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* ── Expanded Order Details ── */}
+                      {expandedOrder === o.id && (
+                        <tr key={`${o.id}-details`}>
+                          <td colSpan={7} className="bg-gradient-to-br from-green-50 to-emerald-50 px-5 py-4 border-b-2 border-green-100">
+                            <div className="grid md:grid-cols-2 gap-5">
+
+                              {/* Items Ordered */}
+                              <div>
+                                <h4 className="text-xs font-bold text-green-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                  <ShoppingBag size={13} /> Items Ordered ({o.items?.length})
+                                </h4>
+                                <div className="space-y-2">
+                                  {o.items?.map((item) => (
+                                    <div key={item.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 shadow-sm border border-green-100">
+                                      <div className="flex items-center gap-3">
+                                        {item.product_image_url ? (
+                                          <img src={item.product_image_url} alt={item.product_name}
+                                            className="w-9 h-9 rounded-lg object-cover bg-slate-100"
+                                            onError={(e) => { e.target.style.display = 'none' }}
+                                          />
+                                        ) : (
+                                          <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+                                            <Package size={14} className="text-green-600" />
+                                          </div>
+                                        )}
+                                        <div>
+                                          <p className="font-semibold text-slate-800 text-sm">{item.product_name}</p>
+                                          <p className="text-xs text-slate-400">Qty: {item.quantity} × ₹{item.price_at_purchase}</p>
+                                        </div>
+                                      </div>
+                                      <span className="font-bold text-green-700 text-sm">₹{(item.quantity * item.price_at_purchase).toFixed(2)}</span>
+                                    </div>
+                                  ))}
+                                  <div className="flex justify-between items-center px-4 py-2 bg-green-700 rounded-xl text-white">
+                                    <span className="text-sm font-semibold">Total</span>
+                                    <span className="font-extrabold">₹{o.total_amount}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Delivery Address */}
+                              <div>
+                                <h4 className="text-xs font-bold text-green-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                  <MapPin size={13} /> Delivery Address
+                                </h4>
+                                <div className="bg-white rounded-xl px-4 py-4 shadow-sm border border-green-100 space-y-1.5">
+                                  <p className="text-sm font-semibold text-slate-800">{o.address_line1}</p>
+                                  {o.address_line2 && <p className="text-sm text-slate-600">{o.address_line2}</p>}
+                                  <p className="text-sm text-slate-600">{o.city}, {o.state} — {o.pincode}</p>
+                                  {o.notes && (
+                                    <div className="mt-2 pt-2 border-t border-slate-100">
+                                      <p className="text-xs text-slate-400 font-medium">Note:</p>
+                                      <p className="text-sm text-slate-600 italic">{o.notes}</p>
+                                    </div>
+                                  )}
+                                  <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
+                                    <span className="text-xs text-slate-400">Payment</span>
+                                    <span className="text-xs font-semibold text-slate-700 uppercase bg-slate-100 px-2 py-0.5 rounded-full">{o.payment_method || 'COD'}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   ))}
                 </tbody>
               </table>
