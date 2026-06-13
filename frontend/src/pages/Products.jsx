@@ -55,23 +55,32 @@ export default function Products() {
 
   return (
     <div className="page-container fade-in">
-      <div className="flex flex-col md:flex-row gap-6">
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
         {/* Sidebar — categories */}
-        <aside className="w-full md:w-56 shrink-0">
-          <div className="card p-4 sticky top-24">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Categories</h3>
+        <aside style={{ width: '220px', flexShrink: 0 }}>
+          <div className="card" style={{ padding: '20px', position: 'sticky', top: '96px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Categories</h3>
               {(q || category) && (
-                <button onClick={clearFilters} className="text-xs text-red-500 hover:text-red-600 flex items-center gap-1">
+                <button onClick={clearFilters} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>
                   <X size={12} /> Clear
                 </button>
               )}
             </div>
-            <ul className="space-y-1">
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <li>
                 <button
                   onClick={() => handleCategory('')}
-                  className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors duration-200 ${!category && !q ? 'bg-green-50 text-green-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+                  style={{
+                    width: '100%', textAlign: 'left', fontSize: '0.875rem',
+                    padding: '8px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    background: !category && !q ? '#f0fdf4' : 'transparent',
+                    color: !category && !q ? '#15803d' : '#475569',
+                    fontWeight: !category && !q ? 600 : 400,
+                    transition: 'background 0.15s, color 0.15s',
+                  }}
+                  onMouseEnter={e => { if (category || q) e.currentTarget.style.background = '#f8fafc' }}
+                  onMouseLeave={e => { if (category || q) e.currentTarget.style.background = 'transparent' }}
                 >
                   All Products
                 </button>
@@ -80,7 +89,16 @@ export default function Products() {
                 <li key={cat.id}>
                   <button
                     onClick={() => handleCategory(cat.slug)}
-                    className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors duration-200 ${category === cat.slug ? 'bg-green-50 text-green-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+                    style={{
+                      width: '100%', textAlign: 'left', fontSize: '0.875rem',
+                      padding: '8px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      background: category === cat.slug ? '#f0fdf4' : 'transparent',
+                      color: category === cat.slug ? '#15803d' : '#475569',
+                      fontWeight: category === cat.slug ? 600 : 400,
+                      transition: 'background 0.15s, color 0.15s',
+                    }}
+                    onMouseEnter={e => { if (category !== cat.slug) e.currentTarget.style.background = '#f8fafc' }}
+                    onMouseLeave={e => { if (category !== cat.slug) e.currentTarget.style.background = 'transparent' }}
                   >
                     {cat.name}
                   </button>
@@ -93,15 +111,16 @@ export default function Products() {
         {/* Main content */}
         <div className="flex-1">
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-            <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none', zIndex: 1 }} />
               <input
                 type="text"
                 placeholder="Search products…"
                 value={localQ}
                 onChange={(e) => setLocalQ(e.target.value)}
-                className="input pl-9"
+                className="input"
+                style={{ paddingLeft: '36px' }}
               />
             </div>
             <button type="submit" className="btn-primary">Search</button>

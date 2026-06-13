@@ -30,7 +30,7 @@ export default function AdminDashboard() {
 
   // Queries
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({ queryKey: ['analytics'], queryFn: getAnalytics })
-  const { data: ordersData, isLoading: ordersLoading } = useQuery({ queryKey: ['admin-orders'], queryFn: () => adminGetOrders({ size: 50 }) })
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({ queryKey: ['admin-orders'], queryFn: () => adminGetOrders({ size: 50 }), staleTime: 0, refetchOnMount: true })
   const { data: productsData, isLoading: productsLoading } = useQuery({ queryKey: ['admin-products'], queryFn: () => adminGetProducts({ size: 50 }) })
   const { data: usersData } = useQuery({ queryKey: ['admin-users'], queryFn: () => getAdminUsers({ size: 50 }) })
   const { data: catData } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
@@ -100,8 +100,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="page-container fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-extrabold text-slate-800">Admin Dashboard</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b' }}>Admin Dashboard</h1>
         <span className="badge badge-orange">Admin</span>
       </div>
 
@@ -185,17 +185,17 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50">
                     <tr>{['Order ID', 'Customer', 'Amount', 'Status', 'Date'].map((h) => (
-                      <th key={h} className="text-left text-xs font-semibold text-slate-500 px-5 py-3 uppercase tracking-wider">{h}</th>
+                      <th key={h} style={{ textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', padding: '12px 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                     ))}</tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {analytics.recent_orders.map((o) => (
-                      <tr key={o.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-5 py-3 font-mono text-xs text-slate-400">#{o.id.slice(0, 8).toUpperCase()}</td>
-                        <td className="px-5 py-3 font-medium text-slate-700">{o.user_name}</td>
-                        <td className="px-5 py-3 font-bold text-slate-800">₹{o.total_amount}</td>
-                        <td className="px-5 py-3"><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
-                        <td className="px-5 py-3 text-slate-400">{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+                      <tr key={o.id} style={{ borderBottom: '1px solid #f8fafc' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background=''}>
+                        <td style={{ padding: '12px 20px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>#{o.id.slice(0, 8).toUpperCase()}</td>
+                        <td style={{ padding: '12px 20px', fontWeight: 500, color: '#334155' }}>{o.user_name}</td>
+                        <td style={{ padding: '12px 20px', fontWeight: 700, color: '#1e293b' }}>₹{o.total_amount}</td>
+                        <td style={{ padding: '12px 20px' }}><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
+                        <td style={{ padding: '12px 20px', color: '#94a3b8' }}>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -281,34 +281,34 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50">
                     <tr>{['Product', 'Category', 'Price', 'Stock', 'Status', 'Actions'].map((h) => (
-                      <th key={h} className="text-left text-xs font-semibold text-slate-500 px-5 py-3 uppercase tracking-wider">{h}</th>
+                      <th key={h} style={{ textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', padding: '12px 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                     ))}</tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {products.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-3">
-                            <img src={p.image_url || ''} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-slate-100"
+                      <tr key={p.id} style={{ borderBottom: '1px solid #f8fafc' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background=''}>
+                        <td style={{ padding: '12px 20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <img src={p.image_url || ''} alt={p.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', background: '#f1f5f9' }}
                               onError={(e) => { e.target.style.display = 'none' }} />
-                            <span className="font-medium text-slate-800 max-w-[160px] truncate">{p.name}</span>
+                            <span style={{ fontWeight: 500, color: '#1e293b', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
                           </div>
                         </td>
-                        <td className="px-5 py-3 text-slate-500">{p.category?.name}</td>
-                        <td className="px-5 py-3">
-                          <span className="font-semibold text-green-700">₹{p.discount_price || p.price}</span>
-                          {p.discount_price && <span className="text-slate-400 text-xs line-through ml-1">₹{p.price}</span>}
+                        <td style={{ padding: '12px 20px', color: '#64748b' }}>{p.category?.name}</td>
+                        <td style={{ padding: '12px 20px' }}>
+                          <span style={{ fontWeight: 600, color: '#15803d' }}>₹{p.discount_price || p.price}</span>
+                          {p.discount_price && <span style={{ color: '#94a3b8', fontSize: '0.75rem', textDecoration: 'line-through', marginLeft: '4px' }}>₹{p.price}</span>}
                         </td>
-                        <td className="px-5 py-3">
-                          <span className={`font-semibold ${p.stock === 0 ? 'text-red-500' : p.stock <= 5 ? 'text-orange-500' : 'text-slate-700'}`}>{p.stock}</span>
+                        <td style={{ padding: '12px 20px' }}>
+                          <span style={{ fontWeight: 600, color: p.stock === 0 ? '#ef4444' : p.stock <= 5 ? '#f97316' : '#334155' }}>{p.stock}</span>
                         </td>
-                        <td className="px-5 py-3">
+                        <td style={{ padding: '12px 20px' }}>
                           <span className={`badge ${p.is_active ? 'badge-green' : 'badge-slate'}`}>{p.is_active ? 'Active' : 'Inactive'}</span>
                         </td>
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => startEdit(p)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"><Edit2 size={15} /></button>
-                            <button onClick={() => { if (window.confirm('Delete this product?')) deleteMutation.mutate(p.id) }} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={15} /></button>
+                        <td style={{ padding: '12px 20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <button onClick={() => startEdit(p)} style={{ padding: '6px', color: '#3b82f6', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer' }} onMouseEnter={e=>e.currentTarget.style.background='#eff6ff'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}><Edit2 size={15} /></button>
+                            <button onClick={() => { if (window.confirm('Delete this product?')) deleteMutation.mutate(p.id) }} style={{ padding: '6px', color: '#ef4444', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer' }} onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}><Trash2 size={15} /></button>
                           </div>
                         </td>
                       </tr>
@@ -329,22 +329,22 @@ export default function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-slate-50">
                   <tr>{['Order ID', 'Items', 'Amount', 'Status', 'Date', 'Update Status', 'Details'].map((h) => (
-                    <th key={h} className="text-left text-xs font-semibold text-slate-500 px-5 py-3 uppercase tracking-wider">{h}</th>
-                  ))}</tr>
+                      <th key={h} style={{ textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', padding: '12px 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                    ))}</tr>
                 </thead>
                 <tbody>
                   {orders.map((o) => (
                     <>
-                      <tr key={o.id} className={`hover:bg-slate-50 transition-colors border-b border-slate-50 ${expandedOrder === o.id ? 'bg-green-50/40' : ''}`}>
-                        <td className="px-5 py-3 font-mono text-xs text-slate-400">#{o.id.slice(0, 8).toUpperCase()}</td>
-                        <td className="px-5 py-3 text-slate-600">
-                          <span className="font-semibold text-slate-700">{o.items?.length || 0}</span>
-                          <span className="text-slate-400 ml-1">item{o.items?.length !== 1 ? 's' : ''}</span>
+                      <tr key={o.id} style={{ borderBottom: '1px solid #f8fafc', background: expandedOrder === o.id ? 'rgba(240,253,244,0.4)' : '' }}>
+                        <td style={{ padding: '12px 20px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>#{o.id.slice(0, 8).toUpperCase()}</td>
+                        <td style={{ padding: '12px 20px', color: '#64748b' }}>
+                          <span style={{ fontWeight: 600, color: '#334155' }}>{o.items?.length || 0}</span>
+                          <span style={{ color: '#94a3b8', marginLeft: '4px' }}>item{o.items?.length !== 1 ? 's' : ''}</span>
                         </td>
-                        <td className="px-5 py-3 font-bold text-slate-800">₹{o.total_amount}</td>
-                        <td className="px-5 py-3"><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
-                        <td className="px-5 py-3 text-slate-400">{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
-                        <td className="px-5 py-3">
+                        <td style={{ padding: '12px 20px', fontWeight: 700, color: '#1e293b' }}>₹{o.total_amount}</td>
+                        <td style={{ padding: '12px 20px' }}><span className={`badge ${STATUS_COLORS[o.status] || 'badge-slate'} capitalize`}>{o.status}</span></td>
+                        <td style={{ padding: '12px 20px', color: '#94a3b8' }}>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+                        <td style={{ padding: '12px 20px' }}>
                           <select
                             value={o.status}
                             onChange={(e) => orderStatusMutation.mutate({ id: o.id, status: e.target.value })}
@@ -353,14 +353,16 @@ export default function AdminDashboard() {
                             {STATUSES.map((s) => <option key={s} value={s} className="capitalize">{s}</option>)}
                           </select>
                         </td>
-                        <td className="px-5 py-3">
+                        <td style={{ padding: '12px 20px' }}>
                           <button
                             onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
-                            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                              expandedOrder === o.id
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                            }`}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '6px',
+                              fontSize: '0.75rem', fontWeight: 600, padding: '6px 12px',
+                              borderRadius: '8px', border: 'none', cursor: 'pointer',
+                              background: expandedOrder === o.id ? '#dcfce7' : '#f1f5f9',
+                              color: expandedOrder === o.id ? '#15803d' : '#64748b',
+                            }}
                           >
                             {expandedOrder === o.id ? <EyeOff size={13} /> : <Eye size={13} />}
                             {expandedOrder === o.id ? 'Hide' : 'View'}
@@ -371,8 +373,8 @@ export default function AdminDashboard() {
                       {/* ── Expanded Order Details ── */}
                       {expandedOrder === o.id && (
                         <tr key={`${o.id}-details`}>
-                          <td colSpan={7} className="bg-gradient-to-br from-green-50 to-emerald-50 px-5 py-4 border-b-2 border-green-100">
-                            <div className="grid md:grid-cols-2 gap-5">
+                          <td colSpan={7} style={{ background: 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', padding: '20px 24px', borderBottom: '2px solid #bbf7d0' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
                               {/* Items Ordered */}
                               <div>
@@ -450,17 +452,17 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50">
                 <tr>{['Name', 'Email', 'Phone', 'Status', 'Joined'].map((h) => (
-                  <th key={h} className="text-left text-xs font-semibold text-slate-500 px-5 py-3 uppercase tracking-wider">{h}</th>
+                  <th key={h} style={{ textAlign: 'left', fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', padding: '12px 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}</tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-3 font-semibold text-slate-800">{u.name}</td>
-                    <td className="px-5 py-3 text-slate-500">{u.email}</td>
-                    <td className="px-5 py-3 text-slate-500">{u.phone || '—'}</td>
-                    <td className="px-5 py-3"><span className={`badge ${u.is_active ? 'badge-green' : 'badge-red'}`}>{u.is_active ? 'Active' : 'Inactive'}</span></td>
-                    <td className="px-5 py-3 text-slate-400">{new Date(u.created_at).toLocaleDateString('en-IN')}</td>
+                  <tr key={u.id} style={{ borderBottom: '1px solid #f8fafc' }} onMouseEnter={e => e.currentTarget.style.background='#f8fafc'} onMouseLeave={e => e.currentTarget.style.background=''}>
+                    <td style={{ padding: '12px 20px', fontWeight: 600, color: '#1e293b' }}>{u.name}</td>
+                    <td style={{ padding: '12px 20px', color: '#64748b' }}>{u.email}</td>
+                    <td style={{ padding: '12px 20px', color: '#64748b' }}>{u.phone || '—'}</td>
+                    <td style={{ padding: '12px 20px' }}><span className={`badge ${u.is_active ? 'badge-green' : 'badge-red'}`}>{u.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td style={{ padding: '12px 20px', color: '#94a3b8' }}>{new Date(u.created_at).toLocaleDateString('en-IN')}</td>
                   </tr>
                 ))}
               </tbody>

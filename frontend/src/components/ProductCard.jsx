@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Info */}
-      <div className="p-3">
+      <div style={{ padding: '14px 16px' }}>
         <p className="text-xs text-slate-400 mb-0.5">{product.category?.name}</p>
         <h3 className="font-semibold text-slate-800 text-sm leading-tight line-clamp-2 group-hover:text-green-700 transition-colors duration-200">
           {product.name}
@@ -77,7 +77,7 @@ export default function ProductCard({ product }) {
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="w-9 h-9 bg-green-600 text-white rounded-xl flex items-center justify-center hover:bg-green-700 active:scale-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+            className="w-9 h-9 m-1.5 bg-green-600 text-white rounded-xl flex items-center justify-center hover:bg-green-700 active:scale-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
             aria-label="Add to cart"
           >
             <ShoppingCart size={15} />

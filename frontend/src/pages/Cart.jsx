@@ -15,12 +15,12 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="page-container fade-in">
-        <div className="max-w-md mx-auto text-center py-24">
-          <div className="w-24 h-24 bg-green-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag size={40} className="text-green-500" />
+        <div style={{ maxWidth: '420px', margin: '0 auto', textAlign: 'center', paddingTop: '80px', paddingBottom: '80px' }}>
+          <div style={{ width: '96px', height: '96px', background: '#f0fdf4', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <ShoppingBag size={40} color="#22c55e" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Your cart is empty</h2>
-          <p className="text-slate-400 mb-8">Add fresh groceries and get them delivered in 30 minutes.</p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>Your cart is empty</h2>
+          <p style={{ color: '#94a3b8', marginBottom: '32px' }}>Add fresh groceries and get them delivered in 30 minutes.</p>
           <Link to="/products" className="btn-primary">
             Start Shopping <ArrowRight size={18} />
           </Link>
@@ -31,45 +31,46 @@ export default function Cart() {
 
   return (
     <div className="page-container fade-in">
-      <h1 className="text-2xl font-extrabold text-slate-800 mb-6">My Cart ({items.length} items)</h1>
-      <div className="grid lg:grid-cols-3 gap-6">
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '24px' }}>My Cart ({items.length} items)</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'flex-start' }}>
         {/* Cart items */}
-        <div className="lg:col-span-2 space-y-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {items.map((item) => <CartItemComponent key={item.id} item={item} />)}
         </div>
 
         {/* Order summary */}
         <div>
-          <div className="card p-6 sticky top-24">
-            <h3 className="font-bold text-slate-800 text-lg mb-4">Order Summary</h3>
-            <div className="space-y-3 text-sm text-slate-600 mb-4">
-              <div className="flex justify-between">
+          <div className="card" style={{ padding: '24px', position: 'sticky', top: '96px' }}>
+            <h3 style={{ fontWeight: 700, color: '#1e293b', fontSize: '1.1rem', marginBottom: '20px' }}>Order Summary</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.875rem', color: '#64748b', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Subtotal ({items.length} items)</span>
-                <span className="font-semibold">₹{total}</span>
+                <span style={{ fontWeight: 600 }}>₹{total}</span>
               </div>
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Delivery Fee</span>
-                <span className={total >= 500 ? 'text-green-600 font-semibold' : 'font-semibold'}>
+                <span style={{ fontWeight: 600, color: total >= 500 ? '#16a34a' : 'inherit' }}>
                   {total >= 500 ? 'FREE' : '₹49'}
                 </span>
               </div>
               {total < 500 && (
-                <p className="text-xs text-green-600 bg-green-50 rounded-lg px-3 py-2">
+                <p style={{ fontSize: '0.75rem', color: '#16a34a', background: '#f0fdf4', borderRadius: '8px', padding: '8px 12px' }}>
                   Add ₹{(500 - total).toFixed(2)} more for free delivery!
                 </p>
               )}
             </div>
-            <div className="border-t border-slate-100 pt-4 flex justify-between font-extrabold text-slate-800 text-lg mb-5">
+            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', fontWeight: 800, color: '#1e293b', fontSize: '1.1rem', marginBottom: '20px' }}>
               <span>Total</span>
               <span>₹{(total + (total >= 500 ? 0 : 49)).toFixed(2)}</span>
             </div>
             <button
               onClick={() => navigate('/checkout')}
-              className="btn-primary w-full py-3 text-base"
+              className="btn-primary"
+              style={{ width: '100%', padding: '12px', fontSize: '1rem', justifyContent: 'center' }}
             >
               Proceed to Checkout <ArrowRight size={18} />
             </button>
-            <Link to="/products" className="btn-ghost w-full mt-3 text-sm justify-center">
+            <Link to="/products" className="btn-ghost" style={{ width: '100%', marginTop: '12px', fontSize: '0.875rem', justifyContent: 'center' }}>
               Continue Shopping
             </Link>
           </div>

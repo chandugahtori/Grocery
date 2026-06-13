@@ -60,7 +60,7 @@ export default function ProductDetail() {
         <ArrowLeft size={18} /> Back
       </button>
 
-      <div className="grid md:grid-cols-2 gap-10">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'flex-start' }}>
         {/* Image */}
         <div className="relative rounded-3xl overflow-hidden bg-slate-50 aspect-square max-h-[480px]">
           <img
@@ -108,22 +108,27 @@ export default function ProductDetail() {
 
           {/* Quantity + Add to Cart */}
           {product.stock > 0 && (
-            <div className="flex items-center gap-4">
-              <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden' }}>
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="w-10 h-12 flex items-center justify-center hover:bg-slate-50 text-lg font-bold text-slate-600 transition-colors"
+                  style={{ width: '40px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700, color: '#475569', background: 'none', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background='#f8fafc'}
+                  onMouseLeave={e => e.currentTarget.style.background='none'}
                 >−</button>
                 <span className="w-12 text-center font-bold text-slate-800">{qty}</span>
                 <button
                   onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
-                  className="w-10 h-12 flex items-center justify-center hover:bg-slate-50 text-lg font-bold text-slate-600 transition-colors"
+                  style={{ width: '40px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 700, color: '#475569', background: 'none', border: 'none', cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background='#f8fafc'}
+                  onMouseLeave={e => e.currentTarget.style.background='none'}
                 >+</button>
               </div>
               <button
                 onClick={handleAddToCart}
                 disabled={adding}
-                className="btn-primary flex-1 py-3 text-base"
+                className="btn-primary"
+                style={{ flex: 1, padding: '12px', fontSize: '1rem', justifyContent: 'center' }}
               >
                 <ShoppingCart size={20} />
                 {adding ? 'Adding…' : 'Add to Cart'}
@@ -132,16 +137,16 @@ export default function ProductDetail() {
           )}
 
           {/* Trust badges */}
-          <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-3 gap-4 text-center">
+          <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #f1f5f9', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', textAlign: 'center' }}>
             {[
               ['🚚', 'Free Delivery', 'Above ₹500'],
               ['✅', 'Quality Assured', 'Farm fresh'],
               ['↩️', 'Easy Returns', '24hr policy'],
             ].map(([emoji, title, sub]) => (
               <div key={title}>
-                <p className="text-2xl mb-1">{emoji}</p>
-                <p className="text-xs font-semibold text-slate-700">{title}</p>
-                <p className="text-xs text-slate-400">{sub}</p>
+                <p style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{emoji}</p>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>{title}</p>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{sub}</p>
               </div>
             ))}
           </div>

@@ -11,74 +11,74 @@ export default function CartItem({ item }) {
 
   const handleUpdate = async (newQty) => {
     if (newQty < 1) return
-    if (newQty > product.stock) {
-      toast.error('Not enough stock')
-      return
-    }
-    try {
-      await updateItem(id, newQty)
-    } catch {
-      toast.error('Failed to update quantity')
-    }
+    if (newQty > product.stock) { toast.error('Not enough stock'); return }
+    try { await updateItem(id, newQty) }
+    catch { toast.error('Failed to update quantity') }
   }
 
   const handleRemove = async () => {
-    try {
-      await removeItem(id)
-      toast.success('Item removed from cart')
-    } catch {
-      toast.error('Failed to remove item')
-    }
+    try { await removeItem(id); toast.success('Item removed from cart') }
+    catch { toast.error('Failed to remove item') }
   }
 
   return (
-    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-100 hover:border-slate-200 transition-colors duration-200 fade-in">
+    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: '#fff', borderRadius: '16px', border: '1px solid #f1f5f9', transition: 'border-color 0.2s' }}
+      className="fade-in"
+      onMouseEnter={e => e.currentTarget.style.borderColor = '#e2e8f0'}
+      onMouseLeave={e => e.currentTarget.style.borderColor = '#f1f5f9'}
+    >
       {/* Product Image */}
-      <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-50 shrink-0">
+      <div style={{ width: '80px', height: '80px', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc', flexShrink: 0 }}>
         <img
           src={product.image_url || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200'}
           alt={product.name}
-          className="w-full h-full object-cover"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200' }}
         />
       </div>
 
       {/* Details */}
-      <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-slate-800 text-sm truncate">{product.name}</h4>
-        <p className="text-xs text-slate-400 mt-0.5">{product.unit}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-green-700 font-bold text-sm">₹{price}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</h4>
+        <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>{product.unit}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+          <span style={{ color: '#15803d', fontWeight: 700, fontSize: '0.875rem' }}>₹{price}</span>
           {product.discount_price && (
-            <span className="text-slate-400 text-xs line-through">₹{product.price}</span>
+            <span style={{ color: '#94a3b8', fontSize: '0.75rem', textDecoration: 'line-through' }}>₹{product.price}</span>
           )}
         </div>
       </div>
 
       {/* Quantity control */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         <button
           onClick={() => handleUpdate(quantity - 1)}
-          className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 active:scale-90 transition-all duration-200"
+          style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', cursor: 'pointer', transition: 'background 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+          onMouseLeave={e => e.currentTarget.style.background = '#fff'}
         >
           <Minus size={14} />
         </button>
-        <span className="w-8 text-center font-semibold text-slate-800 text-sm">{quantity}</span>
+        <span style={{ width: '32px', textAlign: 'center', fontWeight: 600, color: '#1e293b', fontSize: '0.875rem' }}>{quantity}</span>
         <button
           onClick={() => handleUpdate(quantity + 1)}
           disabled={quantity >= product.stock}
-          className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 active:scale-90 disabled:opacity-40 transition-all duration-200"
+          style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', cursor: 'pointer', opacity: quantity >= product.stock ? 0.4 : 1, transition: 'background 0.15s' }}
+          onMouseEnter={e => { if (quantity < product.stock) e.currentTarget.style.background = '#f8fafc' }}
+          onMouseLeave={e => e.currentTarget.style.background = '#fff'}
         >
           <Plus size={14} />
         </button>
       </div>
 
       {/* Subtotal + remove */}
-      <div className="text-right shrink-0">
-        <p className="font-bold text-slate-800 text-sm">₹{subtotal}</p>
+      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <p style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.875rem' }}>₹{subtotal}</p>
         <button
           onClick={handleRemove}
-          className="mt-1 text-red-400 hover:text-red-600 transition-colors duration-200"
+          style={{ marginTop: '4px', color: '#f87171', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.color = '#dc2626'}
+          onMouseLeave={e => e.currentTarget.style.color = '#f87171'}
           aria-label="Remove item"
         >
           <Trash2 size={16} />

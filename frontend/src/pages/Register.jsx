@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Leaf, Eye, EyeOff } from 'lucide-react'
+import { Leaf } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 
@@ -29,56 +29,61 @@ export default function Register() {
     }
   }
 
+  const labelStyle = { display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#334155', marginBottom: '6px' }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md fade-in">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f0fdf4 0%, #fff 50%, #ecfdf5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 20px' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }} className="fade-in">
+
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Leaf size={26} className="text-white" />
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{ width: '56px', height: '56px', background: 'linear-gradient(135deg, #22c55e, #059669)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 24px rgba(22,163,74,0.3)' }}>
+            <Leaf size={26} color="#fff" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-800">Create account</h1>
-          <p className="text-slate-400 mt-1">Join Navix — fresh groceries await</p>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1e293b' }}>Create account</h1>
+          <p style={{ color: '#94a3b8', marginTop: '4px' }}>Join Navix — fresh groceries await</p>
         </div>
 
-        <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="card" style={{ padding: '32px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+              <label style={labelStyle}>Full Name</label>
               <input type="text" name="name" value={form.name} onChange={handleChange}
                 placeholder="Jane Doe" required minLength={2} className="input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <label style={labelStyle}>Email</label>
               <input type="email" name="email" value={form.email} onChange={handleChange}
                 placeholder="you@example.com" required autoComplete="email" className="input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone (optional)</label>
+              <label style={labelStyle}>Phone (optional)</label>
               <input type="tel" name="phone" value={form.phone} onChange={handleChange}
                 placeholder="+91 98765 43210" className="input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
-              <div className="relative">
+              <label style={labelStyle}>Password</label>
+              <div style={{ position: 'relative' }}>
                 <input
                   type={showPw ? 'text' : 'password'} name="password" value={form.password}
                   onChange={handleChange} placeholder="Min 6 characters" required minLength={6}
-                  autoComplete="new-password" className="input pr-11"
+                  autoComplete="new-password" className="input"
+                  style={{ paddingRight: '44px' }}
                 />
                 <button type="button" onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  {showPw ? <EyeOff size={17} /> : <Eye size={17} />}
+                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  {showPw ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full py-3 text-base mt-2">
+            <button type="submit" disabled={loading} className="btn-primary"
+              style={{ width: '100%', padding: '12px', fontSize: '1rem', justifyContent: 'center', marginTop: '4px' }}>
               {loading ? 'Creating Account…' : 'Create Account'}
             </button>
           </form>
-          <p className="text-center text-sm text-slate-500 mt-5">
+          <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#64748b', marginTop: '20px' }}>
             Already have an account?{' '}
-            <Link to="/login" className="text-green-600 font-semibold hover:text-green-700">Sign in</Link>
+            <Link to="/login" style={{ color: '#16a34a', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
           </p>
         </div>
       </div>

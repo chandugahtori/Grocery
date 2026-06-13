@@ -39,7 +39,7 @@ export default function Home() {
           <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="relative section-container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
               🚀 Now delivering in 30 minutes!
@@ -71,7 +71,7 @@ export default function Home() {
 
       {/* Features bar */}
       <section className="bg-white border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="section-container py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* eslint-disable-next-line no-unused-vars */}
             {FEATURES.map(({ icon: FeatureIcon, title, desc, color }) => (
@@ -132,17 +132,19 @@ export default function Home() {
 
       {/* CTA Banner */}
       <section className="page-container pt-0">
-        <div className="rounded-3xl bg-gradient-to-r from-orange-500 to-rose-500 text-white p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-extrabold mb-2">First Order? Get 20% Off!</h3>
-            <p className="text-orange-100">Use code <span className="font-bold bg-white/20 px-2 py-0.5 rounded-lg">NAVIX20</span> at checkout</p>
+        <div className="rounded-3xl bg-gradient-to-r from-orange-500 to-rose-500 text-white" style={{ padding: '40px 40px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start' }}>
+            <div>
+              <h3 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '8px' }}>First Order? Get 20% Off!</h3>
+              <p style={{ color: '#fed7aa' }}>Use code <span style={{ fontWeight: 700, background: 'rgba(255,255,255,0.2)', padding: '2px 10px', borderRadius: '8px' }}>NAVIX20</span> at checkout</p>
+            </div>
+            <button
+              onClick={() => navigate('/register')}
+              style={{ background: '#fff', color: '#ea580c', fontWeight: 700, padding: '12px 32px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '0.95rem', whiteSpace: 'nowrap', boxShadow: '0 4px 15px rgba(0,0,0,0.15)' }}
+            >
+              Claim Offer
+            </button>
           </div>
-          <button
-            onClick={() => navigate('/register')}
-            className="bg-white text-orange-600 font-bold px-8 py-3 rounded-xl hover:bg-orange-50 active:scale-95 transition-all duration-200 whitespace-nowrap shadow-lg"
-          >
-            Claim Offer
-          </button>
         </div>
       </section>
     </div>

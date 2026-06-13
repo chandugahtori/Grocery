@@ -2,41 +2,42 @@ import { Link } from 'react-router-dom'
 import { Leaf, Github, Twitter, Instagram, Mail } from 'lucide-react'
 
 export default function Footer() {
-  // Social Media Links Data
   const socialLinks = [
     { icon: Github, href: "https://github.com/chandugahtori", label: "GitHub" },
     { icon: Twitter, href: "https://twitter.com/not_available", label: "Twitter" },
     { icon: Instagram, href: "https://instagram.com/chandugahtori", label: "Instagram" },
     { icon: Mail, href: "mailto:chandu2004gahtori@gmail.com", label: "Email" },
-  ];
+  ]
 
   return (
-    <footer className="bg-slate-900 text-slate-300 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          
-          {/* Brand Section */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Leaf size={16} className="text-white" />
+    <footer style={{ background: '#0f172a', color: '#cbd5e1', marginTop: '64px' }}>
+      <div className="section-container" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
+
+        {/* Main grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '48px' }}>
+
+          {/* Brand */}
+          <div style={{ gridColumn: 'span 1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #22c55e, #059669)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Leaf size={18} color="#fff" />
               </div>
-              <span className="text-xl font-extrabold text-white">Navix</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>Navix</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
+            <p style={{ fontSize: '0.875rem', color: '#94a3b8', lineHeight: 1.7, maxWidth: '260px', marginBottom: '24px' }}>
               Fresh groceries delivered to your doorstep. Quality products, great prices, lightning-fast delivery.
             </p>
-            
-            {/* Social Links Loop */}
-            <div className="flex gap-3 mt-4">
+            <div style={{ display: 'flex', gap: '10px' }}>
               {socialLinks.map((social, index) => (
-                <a 
+                <a
                   key={index}
-                  href={social.href} 
-                  target={social.icon === Mail ? "_self" : "_blank"} 
-                  rel="noopener noreferrer" 
-                  className="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-green-600 transition-colors duration-200"
+                  href={social.href}
+                  target={social.icon === Mail ? '_self' : '_blank'}
+                  rel="noopener noreferrer"
                   aria-label={social.label}
+                  style={{ width: '38px', height: '38px', background: '#1e293b', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s', textDecoration: 'none', color: '#94a3b8' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#16a34a'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#1e293b'}
                 >
                   <social.icon size={16} />
                 </a>
@@ -44,10 +45,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links (Shop) */}
+          {/* Shop Links */}
           <div>
-            <h4 className="text-white font-semibold mb-3 text-sm uppercase tracking-wider">Shop</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 style={{ color: '#fff', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>Shop</h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {[
                 ['All Products', '/products'],
                 ['Fruits & Vegetables', '/products?category=fruits-vegetables'],
@@ -56,16 +57,23 @@ export default function Footer() {
                 ['Snacks', '/products?category=snacks-namkeen'],
               ].map(([label, href]) => (
                 <li key={href}>
-                  <Link to={href} className="hover:text-green-400 transition-colors duration-200">{label}</Link>
+                  <Link
+                    to={href}
+                    style={{ color: '#94a3b8', fontSize: '0.875rem', textDecoration: 'none', transition: 'color 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#4ade80'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Account Section */}
+          {/* Account Links */}
           <div>
-            <h4 className="text-white font-semibold mb-3 text-sm uppercase tracking-wider">Account</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 style={{ color: '#fff', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>Account</h4>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {[
                 ['Login', '/login'],
                 ['Register', '/register'],
@@ -73,18 +81,27 @@ export default function Footer() {
                 ['My Profile', '/dashboard'],
               ].map(([label, href]) => (
                 <li key={href}>
-                  <Link to={href} className="hover:text-green-400 transition-colors duration-200">{label}</Link>
+                  <Link
+                    to={href}
+                    style={{ color: '#94a3b8', fontSize: '0.875rem', textDecoration: 'none', transition: 'color 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#4ade80'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
+
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-500">© 2026 Navix. All rights reserved.</p>
-          <p className="text-xs text-slate-500">Built with ❤️ for fresh grocery delivery</p>
+        {/* Bottom bar */}
+        <div style={{ borderTop: '1px solid #1e293b', marginTop: '48px', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <p style={{ fontSize: '0.75rem', color: '#475569' }}>© 2026 Navix. All rights reserved.</p>
+          <p style={{ fontSize: '0.75rem', color: '#475569' }}>Built with ❤️ for fresh grocery delivery</p>
         </div>
+
       </div>
     </footer>
   )
